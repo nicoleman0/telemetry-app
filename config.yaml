@@ -1,0 +1,22 @@
+# Telemetry App configuration
+collectors:
+  enabled:
+    - process
+    - network
+    - persistence
+    - system_metadata
+  interval_seconds: 30
+
+storage:
+  type: jsonl  # options: jsonl, sqlite
+  path: data/telemetry.jsonl
+
+normalizer:
+  schema_path: normalizer/telemetry_schema.json
+
+analyzer:
+  net_multiplier: 3.0
+  persistence_multiplier: 3.0
+
+output:
+  report_path: output/report.md
