@@ -6,9 +6,15 @@ from collectors.system_metadata import get_system_metadata
 def collect_network_snapshot():
 	"""Return a single network telemetry event capturing IO counters and open connections summary."""
 	io = psutil.net_io_counters()
-	conns = psutil.net_connections(kind="inet")
-	listening = sum(1 for c in conns if c.status == "LISTEN")
-	established = sum(1 for c in conns if c.status == "ESTABLISHED")
+	listening = 0
+	established = 0
+	try:
+		conns = psutil.net_connections(kind="inet")
+		listening = sum(1 for c in conns if c.status == "LISTEN")
+		established = sum(1 for c in conns if c.status == "ESTABLISHED")
+	except Exception:
+		# On macOS, net_connections may require privileges; fall back gracefully
+		pass
 
 	return {
 		"timestamp": datetime.now().isoformat() + "Z",
