@@ -20,3 +20,4 @@ analyzer:
 
 output:
   report_path: output/report.md
+  html_path: output/report.html

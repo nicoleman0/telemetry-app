@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Telemetry Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root { --bg:#0f172a; --fg:#e2e8f0; --muted:#94a3b8; --accent:#38bdf8; --danger:#ef4444; --ok:#22c55e; }
+    body { background: var(--bg); color: var(--fg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin:0; }
+    .container { max-width: 980px; margin: 0 auto; padding: 24px; }
+    h1, h2 { margin: 0 0 12px; }
+    h1 { font-size: 28px; }
+    h2 { font-size: 20px; color: var(--accent); }
+    .card { background: #0b1220; border: 1px solid #1f2a3f; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .kv { display:flex; align-items:center; justify-content:space-between; padding:6px 10px; border-radius:8px; background:#0a101b; border:1px solid #1a2438; }
+    .kv .label { color: var(--muted); }
+    table { width:100%; border-collapse: collapse; }
+    th, td { text-align:left; padding:8px 10px; border-bottom: 1px solid #1a2438; }
+    th { color: var(--muted); font-weight:600; }
+    .pill { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; background:#0a101b; border:1px solid #1a2438; }
+    .pill.danger { border-color: var(--danger); color: var(--danger); }
+    .pill.ok { border-color: var(--ok); color: var(--ok); }
+    .muted { color: var(--muted); }
+    .footer { margin-top: 16px; color: var(--muted); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Telemetry Report</h1>
+
+    <div class="card">
+      <h2>Baseline Summary</h2>
+      <div class="grid">
+        <div class="kv"><span class="label">Net established avg</span><strong>0.00</strong></div>
+        <div class="kv"><span class="label">Persistence count avg</span><strong>8.00</strong></div>
+        <div class="kv"><span class="label">Event types</span><strong>4</strong></div>
+        <div class="kv"><span class="label">Top processes tracked</span><strong>1</strong></div>
+      </div>
+      <div style="margin-top:12px">
+        <span class="muted">Event type counts:</span>
+        
+          <span class="pill">process_snapshot: 9</span>
+        
+          <span class="pill">persistence_snapshot: 8</span>
+        
+          <span class="pill">system_snapshot: 8</span>
+        
+          <span class="pill">network_snapshot: 7</span>
+        
+      </div>
+      <div style="margin-top:8px">
+        <span class="muted">Top processes:</span>
+        
+          <span class="pill">kernel_task (9)</span>
+        
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Anomalies</h2>
+      <div class="kv"><span class="label">Count</span><strong>0</strong></div>
+      
+        <p class="muted" style="margin-top:8px">No anomalies detected.</p>
+      
+    </div>
+
+    <div class="card">
+      <h2>Recent Events</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Type</th>
+            <th>Process</th>
+            <th>Signed</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td>2025-12-24T14:44:12.781008Z</td>
+            <td><span class="pill">process_snapshot</span></td>
+            <td>kernel_task</td>
+            <td>
+                  <span class="muted">n/a</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:44:12.813312Z</td>
+            <td><span class="pill">network_snapshot</span></td>
+            <td>-</td>
+            <td>
+                  <span class="pill danger">no</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:44:12.813483Z</td>
+            <td><span class="pill">persistence_snapshot</span></td>
+            <td>-</td>
+            <td>
+                  <span class="pill danger">no</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:44:12.813592Z</td>
+            <td><span class="pill">system_snapshot</span></td>
+            <td>-</td>
+            <td>
+                  <span class="pill danger">no</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:46:07.321672Z</td>
+            <td><span class="pill">process_snapshot</span></td>
+            <td>kernel_task</td>
+            <td>
+                  <span class="muted">n/a</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:46:07.356016Z</td>
+            <td><span class="pill">network_snapshot</span></td>
+            <td>-</td>
+            <td>
+                  <span class="pill danger">no</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:46:07.356200Z</td>
+            <td><span class="pill">persistence_snapshot</span></td>
+            <td>-</td>
+            <td>
+                  <span class="pill danger">no</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:46:07.356307Z</td>
+            <td><span class="pill">system_snapshot</span></td>
+            <td>-</td>
+            <td>
+                  <span class="pill danger">no</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:46:09.364576Z</td>
+            <td><span class="pill">process_snapshot</span></td>
+            <td>kernel_task</td>
+            <td>
+                  <span class="muted">n/a</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:46:09.366178Z</td>
+            <td><span class="pill">network_snapshot</span></td>
+            <td>-</td>
+            <td>
+                  <span class="pill danger">no</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:46:09.366869Z</td>
+            <td><span class="pill">persistence_snapshot</span></td>
+            <td>-</td>
+            <td>
+                  <span class="pill danger">no</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:46:09.367217Z</td>
+            <td><span class="pill">system_snapshot</span></td>
+            <td>-</td>
+            <td>
+                  <span class="pill danger">no</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:46:37.256684Z</td>
+            <td><span class="pill">process_snapshot</span></td>
+            <td>kernel_task</td>
+            <td>
+                  <span class="muted">n/a</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:46:37.288505Z</td>
+            <td><span class="pill">network_snapshot</span></td>
+            <td>-</td>
+            <td>
+                  <span class="pill danger">no</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:46:37.288662Z</td>
+            <td><span class="pill">persistence_snapshot</span></td>
+            <td>-</td>
+            <td>
+                  <span class="pill danger">no</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:46:37.288763Z</td>
+            <td><span class="pill">system_snapshot</span></td>
+            <td>-</td>
+            <td>
+                  <span class="pill danger">no</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:47:49.679694Z</td>
+            <td><span class="pill">process_snapshot</span></td>
+            <td>kernel_task</td>
+            <td>
+                  <span class="muted">n/a</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:47:49.719485Z</td>
+            <td><span class="pill">network_snapshot</span></td>
+            <td>-</td>
+            <td>
+                  <span class="pill danger">no</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:47:49.719679Z</td>
+            <td><span class="pill">persistence_snapshot</span></td>
+            <td>-</td>
+            <td>
+                  <span class="pill danger">no</span>
+                
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2025-12-24T14:47:49.719824Z</td>
+            <td><span class="pill">system_snapshot</span></td>
+            <td>-</td>
+            <td>
+                  <span class="pill danger">no</span>
+                
+            </td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+
+    <div class="footer">Generated by Telemetry App</div>
+  </div>
+</body>
+</html>

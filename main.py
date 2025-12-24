@@ -2,6 +2,7 @@ import argparse
 from pathlib import Path
 import yaml
 import logging
+import time
 
 from collectors.process_collector import collect_one_process_event
 from collectors.network_collector import collect_network_snapshot
@@ -14,6 +15,7 @@ from analyzer.baseline import BaselineAnalyzer
 from analyzer.anomaly import AnomalyDetector
 from analyzer.explain import ExplainabilityEngine
 from normalizer.validator import validate_event, load_schema
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 
 def load_config(path: Path = Path("config.yaml")):
@@ -69,46 +71,92 @@ def build_report_md(baseline, anomalies, explanations):
     return "\n".join(lines)
 
 
+def build_report_html(baseline, anomalies, explanations, events):
+    try:
+        templates_dir = Path("output/templates")
+        env = Environment(
+            loader=FileSystemLoader(str(templates_dir)),
+            autoescape=select_autoescape(["html", "xml"]),
+        )
+        tmpl = env.get_template("report.html.j2")
+        return tmpl.render(baseline=baseline, anomalies=anomalies, explanations=explanations, events=events)
+    except Exception as e:
+        logging.warning(f"HTML report generation failed: {e}")
+        return ""
+
+
 def main():
     parser = argparse.ArgumentParser(description="Telemetry App")
     parser.add_argument("--once", action="store_true", help="Run a single collection/analyze cycle")
     parser.add_argument("--config", default="config.yaml", help="Path to config.yaml")
     parser.add_argument("--log", default="INFO", help="Logging level (DEBUG, INFO, WARNING, ERROR)")
+    parser.add_argument("--interval", type=int, help="Seconds between collection cycles (overrides config)")
+    parser.add_argument("--max-cycles", type=int, default=0, help="Maximum cycles to run (0 = unlimited)")
     args = parser.parse_args()
 
     cfg = load_config(Path(args.config))
 
     logging.basicConfig(level=getattr(logging, args.log.upper(), logging.INFO), format="%(levelname)s %(message)s")
 
-    data_path = Path(cfg.get("storage", {}).get("path", str(DEFAULT_DATA_PATH)))
+    def run_cycle():
+        data_path = Path(cfg.get("storage", {}).get("path", str(DEFAULT_DATA_PATH)))
 
-    # Collect
-    events = collect_enabled_events(cfg)
-    if events:
-        write_events(events, data_path=data_path)
-        print(f"✔ {len(events)} telemetry events written to {data_path}")
-    else:
-        print("ℹ No events collected")
+        # Collect
+        events = collect_enabled_events(cfg)
+        if events:
+            write_events(events, data_path=data_path)
+            logging.info(f"{len(events)} telemetry events written to {data_path}")
+        else:
+            logging.info("No events collected")
 
-    # Analyze over all stored data
-    all_events = read_all(data_path=data_path)
-    baseline = BaselineAnalyzer().fit(all_events).summary()
-    detector = AnomalyDetector(
-        net_multiplier=cfg.get("analyzer", {}).get("net_multiplier", 3.0),
-        persistence_multiplier=cfg.get("analyzer", {}).get("persistence_multiplier", 3.0),
-    )
-    anomalies = detector.detect(all_events, baseline)
-    explanations = ExplainabilityEngine().explain(anomalies)
+        # Analyze over all stored data
+        all_events = read_all(data_path=data_path)
+        baseline = BaselineAnalyzer().fit(all_events).summary()
+        detector = AnomalyDetector(
+            net_multiplier=cfg.get("analyzer", {}).get("net_multiplier", 3.0),
+            persistence_multiplier=cfg.get("analyzer", {}).get("persistence_multiplier", 3.0),
+        )
+        anomalies = detector.detect(all_events, baseline)
+        explanations = ExplainabilityEngine().explain(anomalies)
 
-    # Output report
-    report_path = Path(cfg.get("output", {}).get("report_path", "output/report.md"))
-    report_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(report_path, "w") as f:
-        f.write(build_report_md(baseline, anomalies, explanations))
-    print(f"✔ Report written to {report_path}")
+        # Output report
+        report_path = Path(cfg.get("output", {}).get("report_path", "output/report.md"))
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(report_path, "w") as f:
+            f.write(build_report_md(baseline, anomalies, explanations))
+        logging.info(f"Report written to {report_path}")
 
-    if not args.once:
-        print("ℹ '--once' run complete. For scheduling, integrate a timer or launchd.")
+        html_path = Path(cfg.get("output", {}).get("html_path", "output/report.html"))
+        html = build_report_html(baseline, anomalies, explanations, all_events)
+        if html:
+            html_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(html_path, "w") as f:
+                f.write(html)
+            logging.info(f"HTML report written to {html_path}")
+
+    # Determine scheduling
+    interval = args.interval if args.interval is not None else cfg.get("collectors", {}).get("interval_seconds")
+    max_cycles = args.max_cycles
+
+    # If --once or no interval value, run a single cycle
+    if args.once or not interval:
+        run_cycle()
+        logging.info("One-shot run complete")
+        return
+
+    # Scheduled loop
+    logging.info(f"Starting scheduled collection every {interval} seconds")
+    cycles_done = 0
+    try:
+        while True:
+            run_cycle()
+            cycles_done += 1
+            if max_cycles and cycles_done >= max_cycles:
+                logging.info("Reached max cycles; exiting")
+                break
+            time.sleep(interval)
+    except KeyboardInterrupt:
+        logging.info("Interrupted by user; exiting")
 
 
 if __name__ == "__main__":
