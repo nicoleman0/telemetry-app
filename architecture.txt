@@ -1,0 +1,20 @@
+[Collectors] 
+    ├─ process_collector.py 
+    ├─ network_collector.py 
+    ├─ persistence_collector.py 
+    └─ system_metadata.py 
+    
+[Normalizer] 
+    └─ telemetry_schema.json 
+
+[Storage] 
+    └─ sqlite / jsonl 
+
+[Analyzer] 
+    ├─ baseline.py 
+    ├─ anomaly.py 
+    └─ explain.py 
+
+[Output] 
+    ├─ CLI 
+    └─ simple HTML / markdown report

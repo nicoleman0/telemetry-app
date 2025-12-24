@@ -1,0 +1,36 @@
+{
+  "timestamp": "ISO-8601",
+  "host": {
+    "hostname": "",
+    "os": "macOS",
+    "os_version": ""
+  },
+  "event": {
+    "type": "process_start | network_connection | persistence_item",
+    "source": "process_collector | network_collector | persistence_collector"
+  },
+  "process": {
+    "pid": 0,
+    "ppid": 0,
+    "name": "",
+    "path": "",
+    "cmdline": [],
+    "username": "",
+    "signed": false,
+    "team_id": ""
+  },
+  "network": {
+    "remote_ip": "",
+    "remote_port": 0,
+    "protocol": ""
+  },
+  "persistence": {
+    "mechanism": "",
+    "label": "",
+    "path": ""
+  },
+  "risk": {
+    "score": 0,
+    "reasons": []
+  }
+}
