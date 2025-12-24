@@ -21,3 +21,5 @@ analyzer:
 output:
   report_path: output/report.md
   html_path: output/report.html
+  zip_enabled: true
+  zip_path: output/report_bundle.zip

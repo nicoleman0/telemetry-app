@@ -3,6 +3,9 @@ from pathlib import Path
 import yaml
 import logging
 import time
+import zipfile
+from datetime import datetime
+from typing import Optional
 
 from collectors.process_collector import collect_one_process_event
 from collectors.network_collector import collect_network_snapshot
@@ -92,6 +95,8 @@ def main():
     parser.add_argument("--log", default="INFO", help="Logging level (DEBUG, INFO, WARNING, ERROR)")
     parser.add_argument("--interval", type=int, help="Seconds between collection cycles (overrides config)")
     parser.add_argument("--max-cycles", type=int, default=0, help="Maximum cycles to run (0 = unlimited)")
+    parser.add_argument("--zip", action="store_true", help="Bundle reports into a ZIP after each cycle")
+    parser.add_argument("--zip-path", help="Override zip output path")
     args = parser.parse_args()
 
     cfg = load_config(Path(args.config))
@@ -133,6 +138,30 @@ def main():
             with open(html_path, "w") as f:
                 f.write(html)
             logging.info(f"HTML report written to {html_path}")
+
+        # Optional zip bundling
+        zip_enabled = args.zip or bool(cfg.get("output", {}).get("zip_enabled", False))
+        zip_path_override = args.zip_path if args.zip_path else cfg.get("output", {}).get("zip_path")
+        bundle_reports(report_path, html_path, zip_enabled, Path(zip_path_override) if zip_path_override else None)
+
+def bundle_reports(md_path: Path, html_path: Path, zip_enabled: bool, zip_path: Optional[Path]):
+    if not zip_enabled:
+        return
+    if zip_path is None:
+        zip_path = Path("output/report_bundle.zip")
+    try:
+        zip_path.parent.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as z:
+            if md_path.exists():
+                z.write(md_path, arcname=md_path.name)
+            if html_path.exists():
+                z.write(html_path, arcname=html_path.name)
+            # add a small manifest
+            manifest = f"generated_at={datetime.now().isoformat()}Z\nfiles={md_path.name},{html_path.name}\n"
+            z.writestr("manifest.txt", manifest)
+        logging.info(f"ZIP bundle written to {zip_path}")
+    except Exception as e:
+        logging.warning(f"ZIP bundling failed: {e}")
 
     # Determine scheduling
     interval = args.interval if args.interval is not None else cfg.get("collectors", {}).get("interval_seconds")
